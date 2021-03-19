@@ -11,6 +11,6 @@ namespace WebApp.Identity
         public string UserName { get; set; }
         //Totalmente maiusculo
         public string NormalizedUserName { get; set; }
-        public string  PasswordHash { get; set; }
+        public string PasswordHash { get; set; }
     }
 }

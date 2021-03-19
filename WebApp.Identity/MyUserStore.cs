@@ -26,7 +26,7 @@ namespace WebApp.Identity
                     {
                         id = user.Id,
                         userName = user.UserName,
-                        normalizedName = user.NormalizedUserName,
+                        normalizedUserName = user.NormalizedUserName,
                         passwordHash = user.PasswordHash
                     }
                     );
@@ -116,7 +116,13 @@ namespace WebApp.Identity
         {
             using (var connection = GetOpenConnection())
             {
-                await connection.ExecuteAsync(" ",
+                await connection.ExecuteAsync(
+                    "update Users" +
+                    "set [Id] = @id" +
+                    "[UserName] = @userName," +
+                    "[NormalizedUserName] = @normalizedUserName," +
+                    "[PasswordHash] = @PasswordHash" +
+                    "where [Id] = @id",
                     new
                     {
                         id = user.Id,

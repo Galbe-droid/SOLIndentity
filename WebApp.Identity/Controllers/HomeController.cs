@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -14,12 +15,13 @@ namespace WebApp.Identity.Controllers
 {
     public class HomeController : Controller
     {
-        public HomeController(UserManager<MyUser> userManager)
+        private readonly UserManager<IdentityUser> _userManager;
+
+        public HomeController(UserManager<IdentityUser> userManager)
         {
             _userManager = userManager;
         }
-        public UserManager<MyUser> _userManager { get; }
-
+       
         public IActionResult Index()
         {
             return View();
@@ -69,7 +71,7 @@ namespace WebApp.Identity.Controllers
 
                 if(user == null)
                 {
-                    user = new MyUser
+                    user = new IdentityUser()
                     {
                         Id = Guid.NewGuid().ToString(),
                         UserName = model.UserName
@@ -86,6 +88,19 @@ namespace WebApp.Identity.Controllers
 
         [HttpGet]
         public async Task<IActionResult> Register()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult About()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Success()
         {
             return View();
         }
