@@ -31,14 +31,13 @@ namespace WebApp.Identity
 
             var connectionString = @"Integrated Security=SSPI;Persist Security Info=False;Initial Catalog=SOLIdentity;Data Source=DESKTOP-CG60723";
             var migrationAssemble = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
-            services.AddDbContext<IdentityDbContext>(
-                opt => opt.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(migrationAssemble))
-                );
+            services.AddDbContext<MyUserDbContext>(opt => opt.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(migrationAssemble)));
 
-            services.AddIdentityCore<IdentityUser>(option => { });
-            services.AddScoped<IUserStore<IdentityUser>,
-                UserOnlyStore<IdentityUser, IdentityDbContext>>();
-            services.AddAuthentication("cookies").AddCookie("cookies", options => options.LoginPath = "/Home/Login");
+            services.AddIdentity<MyUser, IdentityRole>(option => { }).AddEntityFrameworkStores<MyUserDbContext>();
+
+            services.AddScoped<IUserClaimsPrincipalFactory<MyUser>, MyUserClaimsPrincipalFactory>();
+            
+            services.ConfigureApplicationCookie(options => options.LoginPath = "/Home/Login");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
