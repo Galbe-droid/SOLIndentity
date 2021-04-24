@@ -33,9 +33,23 @@ namespace WebApp.Identity
             var migrationAssemble = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
             services.AddDbContext<MyUserDbContext>(opt => opt.UseSqlServer(connectionString, sql => sql.MigrationsAssembly(migrationAssemble)));
 
-            services.AddIdentity<MyUser, IdentityRole>(option => { }).AddEntityFrameworkStores<MyUserDbContext>();
+            services.AddIdentity<MyUser, IdentityRole>(option =>
+            {
+                option.SignIn.RequireConfirmedEmail = true;
+                option.Password.RequiredLength = 8;
+                option.Password.RequireNonAlphanumeric = false;
+                option.Password.RequireLowercase = false;
+                option.Password.RequireUppercase = false;
 
-            services.AddScoped<IUserClaimsPrincipalFactory<MyUser>, MyUserClaimsPrincipalFactory>();
+                option.Lockout.MaxFailedAccessAttempts = 3;
+                option.Lockout.AllowedForNewUsers = true;
+                option.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+
+            }).AddEntityFrameworkStores<MyUserDbContext>().AddDefaultTokenProviders().AddPasswordValidator<DoesNotContainPasswordValidator<MyUser>>();
+
+            services.AddScoped<IUserClaimsPrincipalFactory<MyUser>, MyUserClaimsPrincipalFactory>() ;
+
+            services.Configure<DataProtectionTokenProviderOptions>(opt => opt.TokenLifespan = TimeSpan.FromHours(3));
             
             services.ConfigureApplicationCookie(options => options.LoginPath = "/Home/Login");
         }
